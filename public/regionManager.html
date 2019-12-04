@@ -1,0 +1,56 @@
+<html>
+
+<body>
+  <div>
+    <h4>Add Manager</h4>
+    <form action="/regionManager/managers" method="POST">
+      <input placeholder="name" name="name">
+      <input placeholder="email" name="email">
+      <input placeholder="address" name="address">
+      <select placeholder="job_title" name="job_title">
+        <option value="guide">Guide</option>
+        <option value="salesperson">salesperson</option>
+        <option value="cleaner">Cleaner</option>
+      </select>
+      <input placeholder="salary" name="salary">
+      <input placeholder="store_id" name="store_id">
+      <button>Submit</button>
+    </form>
+  </div>
+  <div>
+    <h4>Add Product</h4>
+    <!-- <form action="/regionManager/products" method="POST">
+      <input placeholder="amount" name="amount">
+      <input placeholder="cost" name="cost">
+      <input placeholder="kind" name="kind">
+      <input placeholder="price" name="price">
+      <input placeholder="product_id" name="product_id">
+      <input placeholder="product_name" name="product_name">
+      <button>Submit</button>
+    </form> -->
+    <h4>Update Product</h4>
+<!-- 
+    <form action="/regionManager/products/2" method="Delete">
+      <input placeholder="amount" name="amount">
+      <input placeholder="cost" name="cost">
+      <input placeholder="kind" name="kind">
+      <input placeholder="price" name="price">
+      <input placeholder="product_id" name="product_id">
+      <input placeholder="product_name" name="product_name">
+      <button>Submit</button>
+    </form> -->
+
+  </div>
+  <div>
+      <h4>Add Store</h4>
+      <form action="/regionManager/stores" method="POST">
+        <input placeholder="address" name="address">
+        <input placeholder="manager" name="manager">
+        <input placeholder="region_id" name="region_id">
+        <input placeholder="salesperson_num" name="salesperson_num">
+        <button>Submit</button>
+      </form>
+    </div>
+</body>
+
+</html>
