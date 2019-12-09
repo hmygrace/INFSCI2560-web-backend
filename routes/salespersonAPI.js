@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql');
 const dotenv = require('dotenv');
 dotenv.config();
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 
 module.exports = router
@@ -13,7 +14,9 @@ const db = mysql.createConnection({
   database: process.env.database
 });
 
-//addCustomer
+//get session - user identity
+
+//addCustomer - no extra access control needed
 router.post('/customers', (req, res) => {
   let sql;
   let body;
@@ -48,7 +51,7 @@ router.post('/customers', (req, res) => {
   }
 });
 
-//get Customer
+//get Customer - no extra access control needed
 router.get('/customers', (req, res) => {
   let sql = 'SELECT * FROM customers';
   db.query(sql, (err, results) => {
@@ -59,7 +62,7 @@ router.get('/customers', (req, res) => {
   });
 });
 
-//get Customers (home)
+//get Customers (home) - no extra access control needed
 router.get('/customers/home/:cid', (req, res) => {
   let sql = 'SELECT * FROM customers,home WHERE customers.customer_id = home.customer_id and customers.customer_id =' + req.params.cid;
   db.query(sql, (err, results) => {
@@ -70,7 +73,7 @@ router.get('/customers/home/:cid', (req, res) => {
   });
 });
 
-//get Customers (home)
+//get Customers (business) - no extra access control needed
 router.get('/customers/business/:cid', (req, res) => {
   let sql = 'SELECT * FROM customers,business WHERE customers.customer_id = business.customer_id and customers.customer_id =' + req.params.cid;
   db.query(sql, (err, results) => {
@@ -81,7 +84,7 @@ router.get('/customers/business/:cid', (req, res) => {
   });
 });
 
-//update Customer
+//update Customer - no extra access control needed
 router.patch('/customers/:cid', (req, res) => {
   let sql = 'UPDATE customers SET ? WHERE customer_id = ' + req.params.cid;
   let body = {
@@ -124,7 +127,7 @@ router.patch('/customers/:cid', (req, res) => {
 
 });
 
-//delete Customer
+//delete Customer - no extra access control needed
 router.delete('/customers/:cid', (req, res) => {
   let sql = 'DELETE FROM customers WHERE customer_id =' + req.params.cid;
   db.query(sql, (err, results) => {
@@ -167,27 +170,41 @@ router.delete('/customers/:cid', (req, res) => {
 //   });
 // });
 
-// add Transaction
+// add Transaction - get identity from session
 router.post('/transactions', (req, res) => {
-  let sql = 'INSERT INTO transactions SET ?'
-  let body = {
-    //这些项里应该有通过登陆自动获取的部分
-    order_date: req.body.order_date,
-    product_id: req.body.product_id,
-    salesperson_id: req.body.salesperson_id,
-    customer_id: req.body.customer_id,
-    quantity: req.body.quantity,
-    store_id: req.body.store_id
-  }
-  db.query(sql, body, (err, results) => {
-    if (err) throw err;
-  });
-  
-  sql = 'SELECT transaction_product(' + req.body.product_id + ", " + req.body.quantity + ')';
-  db.query(sql, (err, results) => {
-    if (err) throw err;
-    res.send('Transaction added...');
-  });
+  let token = req.headers["authorization"];
+  console.log("headers "+JSON.stringify(req.headers));
+  console.log("token:  "+token);
+  token = token.slice(7, token.length);
+  jwt.verify(token, 'secretKey', (err, decoded) => {
+    if(err){
+        res.status(401).json({
+            result : false,
+            message : "Token invalid"
+        })
+    } 
+    else {
+      let sql = 'INSERT INTO transactions SET ?'
+      let body = {
+        //salesperson_id;store_id
+        order_date: req.body.order_date,
+        product_id: req.body.product_id,
+        salesperson_id: decoded.salesperson_id,
+        customer_id: req.body.customer_id,
+        quantity: req.body.quantity,
+        store_id: decoded.store_id
+      }
+      db.query(sql, body, (err, results) => {
+        if (err) throw err;
+      });
+      
+      sql = 'SELECT transaction_product(' + req.body.product_id + ", " + req.body.quantity + ')';
+      db.query(sql, (err, results) => {
+        if (err) throw err;
+        res.status(200).send('Transaction added');
+      });
+    }
+  })
 });
 
 //get Product/amount
@@ -203,6 +220,7 @@ router.get('/products/amount/:pid', (req, res) => {
 
 //get Transactions
 router.get('/transactions', (req, res) => {
+  console.log("get transactions");
   let sql = 'SELECT * FROM transactions';
   db.query(sql, (err, results) => {
     if (err) {
@@ -260,6 +278,7 @@ router.get('/products', (req, res) => {
 
 //get Product
 router.get('/products/:pid', (req, res) => {
+
   let sql = 'SELECT * FROM product WHERE product_id =' + req.params.pid;
   db.query(sql, (err, results) => {
     if (err) {

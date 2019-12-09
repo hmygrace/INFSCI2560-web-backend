@@ -3,6 +3,7 @@ const mysql = require('mysql');
 const dotenv = require('dotenv');
 dotenv.config();
 const router = express.Router();
+const bcrypt = require('bcrypt');
 
 module.exports = router
 //Create connection
@@ -34,12 +35,15 @@ router.post('/salespersons', (req, res) => {
     if (err) throw err;
   });
 
-  sql = 'INSERT INTO salespersons_account (salesperson_id, password) VALUES (LAST_INSERT_ID(), ' + "'" + req.body.password + "'" + ")";
-  //body里的内容付给对象
-  query = db.query(sql, body, (err, results) => {
-    if (err) throw err;
-    res.send('Salesperson added...');
+  bcrypt.hash(req.body.password, 10, function(err,hash){
+    sql = 'INSERT INTO salespersons_account (salesperson_id, password) VALUES (LAST_INSERT_ID(), ' + "'" + hash + "'" + ")";
+    //body里的内容付给对象
+    query = db.query(sql, body, (err, results) => {
+      if (err) throw err;
+      res.status(200).send('Salesperson added');
+    });
   });
+  
 });
 
 // deleteSalespersons() DELETE /salespersons/said
