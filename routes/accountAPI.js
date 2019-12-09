@@ -25,6 +25,15 @@ router.post('/login', (req, res) => {
     if(err) throw err;
     if(results.length!=0){
       let password = results[0].password;
+      if(password.startsWith("sales")){
+        bcrypt.hash(password,10,function(err,hash){
+          let passwordsql = "UPDATE salespersons_account set password='"+hash+"' where salesperson_id='"+req.body.salesperson_id+"'";
+          let passwdquery = db.query(passwordsql,(err,results)=>{
+            if(err) throw err;
+            password = hash;
+          });
+        });
+      }
       // bcrypt.hash(req.body.password,10,function(err,hash){
       //   console.log("password for "+req.body.password+" is "+hash);
       //   console.log("password from table "+password);
@@ -68,6 +77,8 @@ router.post('/login', (req, res) => {
     }
   });
 });
+
+
 
 //logout - frontend destroy the jwt 
 // router.get('/logout',(req,res) => {

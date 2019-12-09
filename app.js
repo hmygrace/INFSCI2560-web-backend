@@ -16,42 +16,48 @@ app.use(morgan('short'));
 app.all('*', function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "PUT,POST,PATCH,GET,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin,Access-Control-Allow-Headers, X-Requested-With,Origin,Authorization, X-Requested-With,Content-Type,Accept");
+  res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin,Access-Control-Allow-Headers, X-Requested-With,Origin,Authorization,authorization, X-Requested-With,Content-Type,Accept");
   res.header("Content-Type", "application/json;charset=utf-8");
   next();
 });
-app.use('/regionManager', require('../SaleSystem/routes/regionManagerAPI'));
-app.use('/salesperson', require('../SaleSystem/routes/salespersonAPI'));
-app.use('/storeManager', require('../SaleSystem/routes/storeManagerAPI'));
+app.use('/regionManager',checkAuthentication, require('../SaleSystem/routes/regionManagerAPI'));
+app.use('/salesperson',checkAuthentication, require('../SaleSystem/routes/salespersonAPI'));
+app.use('/storeManager',checkAuthentication, require('../SaleSystem/routes/storeManagerAPI'));
 app.use('/account', require('../SaleSystem/routes/accountAPI'));
-app.use('/aggregation', require('../SaleSystem/routes/aggregationAPI'));
+app.use('/aggregation',checkAuthentication, require('../SaleSystem/routes/aggregationAPI'));
 app.use('/browser', require('../SaleSystem/routes/browserAPI'));
 
 
 
 
 app.use(express.static('./public'));
+
+function checkAuthentication(req,res,next){
+  next();
+    // let token = req.headers["authorization"];
+    // if(token && token.startsWith("Bearer ")){
+    //   console.log("token contained");
+    //     token = token.slice(7, token.length)
+    //     jwt.verify(token, 'secretKey', (err, decoded) => {
+    //       if(err){
+    //           res.status(401).json({
+    //               result : false,
+    //               message : "Token invalid"
+    //           })
+    //       } 
+    //       else {
+    //          next()
+    //       }
+    //     }) 
+    // } else {
+    //   console.log("token not contained "+token);
+    //     res.status(403).json({
+    //         result : false,
+    //         message : "token missing"
+    //     })
+    // } 
+}
 // app.use("*", function(req, res, next){
-//   let token = req.headers['Authorization'] || req.headers['x-access-token']
-//   if(token && token.startsWith("Bearer ")){
-//       token = token.slice(7, token.length)
-//       jwt.verify(token, 'secretKey', (err, decoded) => {
-//         if(err){
-//             res.status(401).json({
-//                 result : false,
-//                 message : "Token invalid"
-//             })
-//         } 
-//         else {
-//            next()
-//         }
-//       }) 
-//   } else {
-//       res.status(400).json({
-//           result : false,
-//           message : "Token missing"
-//       })
-//   } 
 //  })
 const port = 5000;
 

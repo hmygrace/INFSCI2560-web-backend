@@ -207,7 +207,7 @@ router.post('/transactions', (req, res) => {
   })
 });
 
-//get Product/amount
+//get Product/amount - no extra access control needed
 router.get('/products/amount/:pid', (req, res) => {
   let sql = 'SELECT amount FROM product WHERE product_id = ' + req.params.pid;
   db.query(sql, (err, results) => {
@@ -218,7 +218,7 @@ router.get('/products/amount/:pid', (req, res) => {
   });
 });
 
-//get Transactions
+//get Transactions - no extra access control needed
 router.get('/transactions', (req, res) => {
   console.log("get transactions");
   let sql = 'SELECT * FROM transactions';
@@ -252,7 +252,7 @@ router.patch('/transactions/:oid', (req, res) => {
   });
 });
 
-//delete Transaction
+//delete Transaction - no extra access control needed(everyone has account can delete it)
 router.delete('/transactions/:oid', (req, res) => {
   let sql = 'DELETE FROM transactions WHERE order_id=' + req.params.oid;
   db.query(sql, (err, results) => {
@@ -264,7 +264,7 @@ router.delete('/transactions/:oid', (req, res) => {
   });
 });
 
-//get Products
+//get Products - no extra access control needed
 router.get('/products', (req, res) => {
   let sql = 'SELECT * FROM product';
 
@@ -276,7 +276,7 @@ router.get('/products', (req, res) => {
   });
 });
 
-//get Product
+//get Product - no extra access control needed
 router.get('/products/:pid', (req, res) => {
 
   let sql = 'SELECT * FROM product WHERE product_id =' + req.params.pid;
